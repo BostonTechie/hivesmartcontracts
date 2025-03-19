@@ -71,6 +71,10 @@ describe('beedollar', function () {
     new Promise(async (resolve) => {
 
       await fixture.setUp();
+      console.log(`url: ${conf.databaseURL} name: ${conf.databaseName}`)
+
+
+
 
       let refBlockNumber = fixture.getNextRefBlockNumber();
       let transactions = [];
