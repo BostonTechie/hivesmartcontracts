@@ -13,7 +13,7 @@ const { assertError } = require('../libs/util/testing/Asserts');
 
 
 const tknContractPayload = setupContractPayload('tokens', './contracts/tokens.js');
-const bdContractPayload = setupContractPayload('beedollar', './contracts/beedollar.js');
+const bdContractPayload = setupContractPayload('beedollar', './contracts/urqdollar.js');
 const mpContractPayload = setupContractPayload('marketpools', './contracts/marketpools.js');
 
 const fixture = new Fixture();
@@ -71,18 +71,24 @@ describe('beedollar', function () {
     new Promise(async (resolve) => {
 
       await fixture.setUp();
-      console.log(`url: ${conf.databaseURL} name: ${conf.databaseName}`)
+      console.log(`url: ${conf.databaseURL} name: ${conf.databaseName} ${conf.genesisSteemBlock}`)
 
 
 
-
+/*   getNextRefBlockNumber() {
+    this.refBlockNumber += 1;
+    return this.refBlockNumber;
+  }*/
       let refBlockNumber = fixture.getNextRefBlockNumber();
+
       let transactions = [];
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(tknContractPayload)));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'deploy', JSON.stringify(bdContractPayload)));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(bdContractPayload)));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'beedollar', 'updateParams', '{ "minConvertibleAmount": "5.5", "feePercentage": "0.025" }'));
 
+
+      console.log(transactions)
       let block = {
         refHiveBlockNumber: refBlockNumber,
         refHiveBlockId: 'ABCD1',

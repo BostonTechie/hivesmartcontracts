@@ -18,6 +18,7 @@ actions.updateParams = async (payload) => {
   } = payload;
 
   const params = await api.db.findOne('params', {});
+ 
 
   if (minConvertibleAmount && typeof minConvertibleAmount === 'string' && !api.BigNumber(minConvertibleAmount).isNaN() && api.BigNumber(minConvertibleAmount).gte(0)) {
     params.minConvertibleAmount = minConvertibleAmount;
