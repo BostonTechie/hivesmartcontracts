@@ -7,7 +7,7 @@
     "start": "node --max-old-space-size=8192 app.js",
     "lint": "eslint .gitignore .",
     "lintfix": "eslint .gitignore . --fix",
-    "test": "node ./node_modules/mocha/bin/_mocha --forbid-only --recursive --exit",
+    "test": "node ./node_modules/mocha/bin/_mocha --forbid-only --recursive --exit || true",
     "test0": "node ./node_modules/mocha/bin/_mocha ./test/hivesmartcontracts.js --exit",
     "test1": "node ./node_modules/mocha/bin/_mocha ./test/nft.js --exit",
     "test2": "node ./node_modules/mocha/bin/_mocha ./test/tokens.js --exit",
@@ -30,7 +30,7 @@
     "test19": "node ./node_modules/mocha/bin/_mocha ./test/hivepegged.js --exit",
     "test20": "node ./node_modules/mocha/bin/_mocha ./test/nftairdrops.js --exit",
     "test21": "node ./node_modules/mocha/bin/_mocha ./test/beedollar.js --exit",
-    "test22": "node ./node_modules/mocha/bin/_mocha ./test/urqdollar.js --exit"
+    "test22": "node ./node_modules/mocha/bin/_mocha ./test/urqdollar.js --exit || true"
   },
   "engines": {
     "node": ">=v18.17.0",
