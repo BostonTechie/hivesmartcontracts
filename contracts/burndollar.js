@@ -5,25 +5,37 @@
 /* eslint-disable no-continue */
 /* global actions, api */
 
-const UTILITY_TOKEN_SYMBOL = 'URQ';
+const UTILITY_TOKEN_SYMBOL = 'BEE';
 const UTILITY_TOKEN_PRECISION = 8;
-const URQ_PRECISION = 4;
+const BEED_PRECISION = 4;
 
 actions.updateParams = async (payload) => {
   if (api.sender !== api.owner) return;
 
-  const {
-    minConvertibleAmount,
-    feePercentage,
+  // this api sender and owner will need to be seperated into the 2 pieces later
+  // const {
+  //   minConvertibleAmount,
+  //   feePercentage,
+  // } = payload;
+
+
+   const {
+    issueTokenFee,
+    updateParamsFee,
+    burnUsageFee,
+
   } = payload;
 
   const params = await api.db.findOne('params', {});
 
-  if (minConvertibleAmount && typeof minConvertibleAmount === 'string' && !api.BigNumber(minConvertibleAmount).isNaN() && api.BigNumber(minConvertibleAmount).gte(0)) {
-    params.minConvertibleAmount = minConvertibleAmount;
+  if (issueTokenFee && typeof issueTokenFee === 'string' && !api.BigNumber(issueTokenFee).isNaN() && api.BigNumber(issueTokenFee).gte(0)) {
+    params.issueTokenFee = issueTokenFee;
   }
-  if (feePercentage && typeof feePercentage === 'string' && !api.BigNumber(feePercentage).isNaN() && api.BigNumber(feePercentage).gte(0)) {
-    params.feePercentage = feePercentage;
+  if (updateParamsFee && typeof updateParamsFee === 'string' && !api.BigNumber(updateParamsFee).isNaN() && api.BigNumber(updateParamsFee).gte(0)) {
+    params.updateParamsFee = updateParamsFee;
+  }
+  if (burnUsageFee && typeof burnUsageFee === 'string' && !api.BigNumber(burnUsageFee).isNaN() && api.BigNumber(burnUsageFee).gte(0)) {
+    params.burnUsageFee = burnUsageFee;
   }
 
   await api.db.update('params', params);
@@ -74,21 +86,31 @@ actions.createSSC = async () => {
   if (tableExists === false) {
     await api.db.createTable('params');
 
-    const params = {};
-    params.minConvertibleAmount = '1';
-    params.feePercentage = '0.01';
-    params.tokenname = 'URQ';
 
+    
+    /* For a token_contract owner to issue a new -D token the price is 1000 BEED (burn).
+      the smart contrart will bootstrap the -D token into existance
+      The underlying token must already exist using seperate established token creation smart contract.
+      token_contract owner inherits ownship of the new -D contract 
+      after the creation of -D token if the token_contract owner wants to edit the paramaters of their -D token they can for 100 BEED (burn).
+      if the token and new -D token have sufficient liquidity pools then any user can burn xxx to get xxx-d for 1 BEED(burn). 
+      The 1 BEED(burn) is seperate from the -D token paramters set by token_contract owner, and is not subject to their edits of a token_contract owner
+    */
+   
+    const params = {};
+    params.issueTokenFee = '1000';
+    params.updateParamsFee = '100';
+    params.burnUsageFee = '1';
     await api.db.insert('params', params);
   }
-  const token = await api.db.findOneInTable('tokens', 'tokens', { symbol: 'URQD' });
+  const token = await api.db.findOneInTable('tokens', 'tokens', { symbol: 'BEED' });
   if (!token) {
     // bootstrap the BEED token into existence
     const tokenProps = {
-      name: 'UrqD',
-      symbol: 'URQD',
+      name: 'BeeD',
+      symbol: 'BEED',
       url: 'https://tribaldex.com',
-      precision: URQ_PRECISION,
+      precision: BEED_PRECISION,
       maxSupply: `${Number.MAX_SAFE_INTEGER}`,
     };
 
@@ -99,7 +121,7 @@ actions.createSSC = async () => {
     };
 
     const updateData = {
-      symbol: 'URQD',
+      symbol: 'BEED',
       metadata: meta,
     };
 
@@ -114,19 +136,12 @@ actions.convert = async (payload) => {
   } = payload;
 
   if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    /* Ensures that quantity is a non-empty string and represents a valid number 
-  (using api.BigNumber for numerical checks). Otherwise, it outputs: "invalid params."*/
-    && api.assert(quantity && typeof quantity === 'string' && !api.BigNumber(quantity).isNaN(), 'invalid params check that quantity is a not empty and represents a valid number')) {
-
+    && api.assert(quantity && typeof quantity === 'string' && !api.BigNumber(quantity).isNaN(), 'invalid params')) {
     const params = await api.db.findOne('params', {});
     const qtyAsBigNum = api.BigNumber(quantity);
-
-    //Validates:  That the quantity is greater than or equal to the minConvertibleAmount
     if (api.assert(qtyAsBigNum.gte(params.minConvertibleAmount), `amount to convert must be >= ${params.minConvertibleAmount}`)
       && api.assert(countDecimals(quantity) <= UTILITY_TOKEN_PRECISION, 'symbol precision mismatch')) {
-
-    //Balance Verification:  Calls verifyUtilityTokenBalance to ensure the sender has sufficient tokens to perform the conversion.
-        const hasEnoughBalance = await verifyUtilityTokenBalance(quantity, api.sender);
+      const hasEnoughBalance = await verifyUtilityTokenBalance(quantity, api.sender);
       if (!api.assert(hasEnoughBalance, 'not enough balance')) {
         return false;
       }
@@ -154,8 +169,8 @@ actions.convert = async (payload) => {
       const beePriceInDollars = api.BigNumber(beePriceInHive).multipliedBy(hivePriceInHBD).toFixed(UTILITY_TOKEN_PRECISION, api.BigNumber.ROUND_DOWN);
 
       // calculate how much BEED should be issued
-      const urqToIssue = finalQty.multipliedBy(beePriceInDollars).toFixed(URQ_PRECISION, api.BigNumber.ROUND_DOWN);
-      if (!api.assert(api.BigNumber(urqToIssue).gte('0.0001'), `resulting token issuance is too small; BEE price is ${beePriceInDollars}`)) {
+      const beedToIssue = finalQty.multipliedBy(beePriceInDollars).toFixed(BEED_PRECISION, api.BigNumber.ROUND_DOWN);
+      if (!api.assert(api.BigNumber(beedToIssue).gte('0.0001'), `resulting token issuance is too small; BEE price is ${beePriceInDollars}`)) {
         return false;
       }
 
@@ -166,11 +181,11 @@ actions.convert = async (payload) => {
 
       // finally, issue the new BEED
       await api.executeSmartContract('tokens', 'issue', {
-        to: api.sender, symbol: 'URQD', quantity: urqToIssue,
+        to: api.sender, symbol: 'BEED', quantity: beedToIssue,
       });
 
-      api.emit('urqConversion', {
-        to: api.sender, fee, bee: finalQty.toFixed(UTILITY_TOKEN_PRECISION), urqd: urqToIssue, beePriceInUSD: beePriceInDollars,
+      api.emit('beeConversion', {
+        to: api.sender, fee, bee: finalQty.toFixed(UTILITY_TOKEN_PRECISION), beed: beedToIssue, beePriceInUSD: beePriceInDollars,
       });
 
       return true;

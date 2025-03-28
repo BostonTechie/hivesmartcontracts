@@ -21,7 +21,7 @@ const tableAsserts = new TableAsserts(fixture);
 
 // test cases for beedollar smart contract
 describe('burndollar', function () {
-  this.timeout(6000);
+  this.timeout(5000);
 
   before((done) => {
     new Promise(async (resolve) => {
@@ -77,7 +77,7 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(tknContractPayload)));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'deploy', JSON.stringify(bdContractPayload)));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(bdContractPayload)));
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'burndollar', 'updateParams', '{ "minConvertibleAmount": "1", "feePercentage": "0.01" }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'burndollar', 'updateParams', '{ "issueTokenFee": "1200", "updateParamsFee": "200", "burnUsageFee": "2"}'));
 
       let block = {
         refHiveBlockNumber: refBlockNumber,
@@ -103,8 +103,9 @@ describe('burndollar', function () {
 
       console.log(params);
 
-      assert.equal(params.minConvertibleAmount, '1');
-      assert.equal(params.feePercentage, '0.01');
+      assert.equal(params.issueTokenFee, '1200');
+      assert.equal(params.updateParamsFee, '200');
+      assert.equal(params.burnUsageFee, '2');
 
       resolve();
     })
@@ -114,6 +115,7 @@ describe('burndollar', function () {
       });
   });
 
+  // it('rejects invalid parameters', (done) => {
   //   new Promise(async (resolve) => {
 
   //     await fixture.setUp();
@@ -296,8 +298,6 @@ describe('burndollar', function () {
   //       transactions,
   //     };
 
-  //     console.log(transactions[23], "loggging here")
-
   //     await fixture.sendBlock(block);
 
   //     // confirm that no BEE was burned
@@ -313,8 +313,7 @@ describe('burndollar', function () {
   //         symbol: 'BEED',
   //       }
   //     });
-    
-  
+  //     console.log(token);
   //     assert.equal(token.supply, '0');
 
   //     const latestBlock = await fixture.database.getLatestBlockInfo();
@@ -328,7 +327,7 @@ describe('burndollar', function () {
   //     console.log(JSON.parse(transactionsBlock1[27].logs).errors);
 
   //     assert.equal(JSON.parse(transactionsBlock1[22].logs).errors[0], 'you must use a custom_json signed with your active key');
-  //     assert.equal(JSON.parse(transactionsBlock1[23].logs).errors[0], 'invalid params check that quantity is a not empty and represents a valid number');
+  //     assert.equal(JSON.parse(transactionsBlock1[23].logs).errors[0], 'invalid params');
   //     assert.equal(JSON.parse(transactionsBlock1[24].logs).errors[0], 'amount to convert must be >= 1');
   //     assert.equal(JSON.parse(transactionsBlock1[25].logs).errors[0], 'amount to convert must be >= 1');
   //     assert.equal(JSON.parse(transactionsBlock1[26].logs).errors[0], 'symbol precision mismatch');
