@@ -112,19 +112,12 @@ actions.convert = async (payload) => {
   } = payload;
 
   if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    /* Ensures that quantity is a non-empty string and represents a valid number 
-  (using api.BigNumber for numerical checks). Otherwise, it outputs: "invalid params."*/
     && api.assert(quantity && typeof quantity === 'string' && !api.BigNumber(quantity).isNaN(), 'invalid params')) {
-
     const params = await api.db.findOne('params', {});
     const qtyAsBigNum = api.BigNumber(quantity);
-
-    //Validates:  That the quantity is greater than or equal to the minConvertibleAmount
     if (api.assert(qtyAsBigNum.gte(params.minConvertibleAmount), `amount to convert must be >= ${params.minConvertibleAmount}`)
       && api.assert(countDecimals(quantity) <= UTILITY_TOKEN_PRECISION, 'symbol precision mismatch')) {
-
-    //Balance Verification:  Calls verifyUtilityTokenBalance to ensure the sender has sufficient tokens to perform the conversion.
-        const hasEnoughBalance = await verifyUtilityTokenBalance(quantity, api.sender);
+      const hasEnoughBalance = await verifyUtilityTokenBalance(quantity, api.sender);
       if (!api.assert(hasEnoughBalance, 'not enough balance')) {
         return false;
       }

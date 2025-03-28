@@ -30,7 +30,7 @@
     "test19": "node ./node_modules/mocha/bin/_mocha ./test/hivepegged.js --exit",
     "test20": "node ./node_modules/mocha/bin/_mocha ./test/nftairdrops.js --exit",
     "test21": "node ./node_modules/mocha/bin/_mocha ./test/beedollar.js --exit",
-    "test22": "node ./node_modules/mocha/bin/_mocha ./test/urqdollar.js --exit || true"
+    "test22": "node ./node_modules/mocha/bin/_mocha ./test/burndollar.js --exit || true"
   },
   "engines": {
     "node": ">=v18.17.0",

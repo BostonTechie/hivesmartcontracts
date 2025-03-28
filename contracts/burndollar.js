@@ -5,9 +5,9 @@
 /* eslint-disable no-continue */
 /* global actions, api */
 
-const UTILITY_TOKEN_SYMBOL = 'BEE';
+const UTILITY_TOKEN_SYMBOL = 'URQ';
 const UTILITY_TOKEN_PRECISION = 8;
-const BEED_PRECISION = 4;
+const URQ_PRECISION = 4;
 
 actions.updateParams = async (payload) => {
   if (api.sender !== api.owner) return;
@@ -77,16 +77,18 @@ actions.createSSC = async () => {
     const params = {};
     params.minConvertibleAmount = '1';
     params.feePercentage = '0.01';
+    params.tokenname = 'URQ';
+
     await api.db.insert('params', params);
   }
-  const token = await api.db.findOneInTable('tokens', 'tokens', { symbol: 'BEED' });
+  const token = await api.db.findOneInTable('tokens', 'tokens', { symbol: 'URQD' });
   if (!token) {
     // bootstrap the BEED token into existence
     const tokenProps = {
-      name: 'BeeD',
-      symbol: 'BEED',
+      name: 'UrqD',
+      symbol: 'URQD',
       url: 'https://tribaldex.com',
-      precision: BEED_PRECISION,
+      precision: URQ_PRECISION,
       maxSupply: `${Number.MAX_SAFE_INTEGER}`,
     };
 
@@ -97,7 +99,7 @@ actions.createSSC = async () => {
     };
 
     const updateData = {
-      symbol: 'BEED',
+      symbol: 'URQD',
       metadata: meta,
     };
 
@@ -152,8 +154,8 @@ actions.convert = async (payload) => {
       const beePriceInDollars = api.BigNumber(beePriceInHive).multipliedBy(hivePriceInHBD).toFixed(UTILITY_TOKEN_PRECISION, api.BigNumber.ROUND_DOWN);
 
       // calculate how much BEED should be issued
-      const beedToIssue = finalQty.multipliedBy(beePriceInDollars).toFixed(BEED_PRECISION, api.BigNumber.ROUND_DOWN);
-      if (!api.assert(api.BigNumber(beedToIssue).gte('0.0001'), `resulting token issuance is too small; BEE price is ${beePriceInDollars}`)) {
+      const urqToIssue = finalQty.multipliedBy(beePriceInDollars).toFixed(URQ_PRECISION, api.BigNumber.ROUND_DOWN);
+      if (!api.assert(api.BigNumber(urqToIssue).gte('0.0001'), `resulting token issuance is too small; BEE price is ${beePriceInDollars}`)) {
         return false;
       }
 
@@ -164,11 +166,11 @@ actions.convert = async (payload) => {
 
       // finally, issue the new BEED
       await api.executeSmartContract('tokens', 'issue', {
-        to: api.sender, symbol: 'BEED', quantity: beedToIssue,
+        to: api.sender, symbol: 'URQD', quantity: urqToIssue,
       });
 
-      api.emit('beeConversion', {
-        to: api.sender, fee, bee: finalQty.toFixed(UTILITY_TOKEN_PRECISION), beed: beedToIssue, beePriceInUSD: beePriceInDollars,
+      api.emit('urqConversion', {
+        to: api.sender, fee, bee: finalQty.toFixed(UTILITY_TOKEN_PRECISION), urqd: urqToIssue, beePriceInUSD: beePriceInDollars,
       });
 
       return true;
