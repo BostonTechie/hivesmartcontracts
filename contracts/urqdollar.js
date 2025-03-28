@@ -114,7 +114,7 @@ actions.convert = async (payload) => {
   if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
     /* Ensures that quantity is a non-empty string and represents a valid number 
   (using api.BigNumber for numerical checks). Otherwise, it outputs: "invalid params."*/
-    && api.assert(quantity && typeof quantity === 'string' && !api.BigNumber(quantity).isNaN(), 'invalid params check that quantity is a non-empty string and represents a valid number')) {
+    && api.assert(quantity && typeof quantity === 'string' && !api.BigNumber(quantity).isNaN(), 'invalid params check that quantity is a not empty and represents a valid number')) {
 
     const params = await api.db.findOne('params', {});
     const qtyAsBigNum = api.BigNumber(quantity);

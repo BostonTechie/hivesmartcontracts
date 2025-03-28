@@ -297,7 +297,7 @@ describe('beedollar', function () {
         transactions,
       };
 
-      //console.log(transactions[27], "loggging here")
+      console.log(transactions[23], "loggging here")
 
       await fixture.sendBlock(block);
 
@@ -315,7 +315,7 @@ describe('beedollar', function () {
         }
       });
     
-      console.log(token);
+  
       assert.equal(token.supply, '0');
 
       const latestBlock = await fixture.database.getLatestBlockInfo();
@@ -329,7 +329,7 @@ describe('beedollar', function () {
       console.log(JSON.parse(transactionsBlock1[27].logs).errors);
 
       assert.equal(JSON.parse(transactionsBlock1[22].logs).errors[0], 'you must use a custom_json signed with your active key');
-      assert.equal(JSON.parse(transactionsBlock1[23].logs).errors[0], 'invalid params check that quantity is a non-empty string and represents a valid number');
+      assert.equal(JSON.parse(transactionsBlock1[23].logs).errors[0], 'invalid params check that quantity is a not empty and represents a valid number');
       assert.equal(JSON.parse(transactionsBlock1[24].logs).errors[0], 'amount to convert must be >= 1');
       assert.equal(JSON.parse(transactionsBlock1[25].logs).errors[0], 'amount to convert must be >= 1');
       assert.equal(JSON.parse(transactionsBlock1[26].logs).errors[0], 'symbol precision mismatch');
