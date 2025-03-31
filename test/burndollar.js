@@ -115,6 +115,54 @@ describe('burndollar', function () {
       });
   });
 
+
+  it('uses my new function', (done) => {
+    new Promise(async (resolve) => {
+
+      await fixture.setUp();
+
+      let refBlockNumber = fixture.getNextRefBlockNumber();
+      let transactions = [];
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(tknContractPayload)));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'deploy', JSON.stringify(bdContractPayload)));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(bdContractPayload)));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'burndollar', 'createTokenD', '{ "issuer": "Andrew"}'));
+
+      let block = {
+        refHiveBlockNumber: refBlockNumber,
+        refHiveBlockId: 'ABCD1',
+        prevRefHiveBlockId: 'ABCD2',
+        timestamp: '2018-06-01T00:00:00',
+        transactions,
+      };
+
+      await fixture.sendBlock(block);
+
+      const res = await fixture.database.getBlockInfo(1);
+
+      const block1 = res;
+      const transactionsBlock1 = block1.transactions;
+
+      // check if the params updated OK
+      const params = await fixture.database.findOne({
+        contract: 'burndollar',
+        table: 'burnpair',
+        query: {}
+      });
+
+      console.log(params);
+
+      assert.equal(params.issuer, 'Andrew');
+
+
+      resolve();
+    })
+      .then(() => {
+        fixture.tearDown();
+        done();
+      });
+  });
+
   // it('rejects invalid parameters', (done) => {
   //   new Promise(async (resolve) => {
 

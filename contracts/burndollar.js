@@ -64,22 +64,19 @@ actions.updateParams = async (payload) => {   //    this function will update th
 
 };
 
-// actions.appendTokentoD = async (payload) => { //allow a token_owner to create the new D Token
+actions.createTokenD = async (payload) => { //allow a token_owner to create the new D Token
+
+  if (api.sender !== api.owner) return;
+
+  const {
+    issuer,
+    } = payload;
 
 
-//   const {
-//     name, symbol, url, precision, maxSupply, isSignedWithActiveKey,
-//     callingContractInfo,
-//   } = payload;
+const newDtoken = {}
+  newDtoken.issuer = issuer;
+
+await api.db.insert('burnpair', newDtoken)
 
 
-//   //   const params = await api.db.findOne('params', {});
-//   //   const { issueDTokenFee  } = params;
-
-
-//   const utilityTokenBalance = await api.db.findOne('token_balances', { account: api.sender, symbol: 'BEED' });
-
-
-//   console.log(utilityTokenBalance)
-// }
-
+}
