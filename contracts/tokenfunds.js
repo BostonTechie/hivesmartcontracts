@@ -333,7 +333,7 @@ actions.createProposal = async (payload) => {
     && api.assert(api.BigNumber(amountPerDay).lte(dtf.maxAmountPerDay), 'invalid amountPerDay: exceeds DTF maxAmountPerDay')
     && api.assert(typeof payout === 'object'
       && typeof payout.type === 'string' && PayoutType.indexOf(payout.type) !== -1
-      && (payout.type !== 'contract' || typeof payout.contractPayload === 'object')
+      && (payout.type !== 'contract' || typeof payout. === 'object')
       && typeof payout.name === 'string' && payout.name.length >= 3 && payout.name.length <= 50, 'invalid payout settings')
     && validateDateRange(startDate, endDate, dtf.maxDays)) {
     const newProposal = {

@@ -67,7 +67,7 @@ describe('burndollar', function () {
       })
   });
 
-  it('updates parameters', (done) => {
+  it('updates parameters on the fee charges in the burndollar contract', (done) => {
     new Promise(async (resolve) => {
 
       await fixture.setUp();
