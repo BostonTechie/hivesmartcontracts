@@ -5,9 +5,6 @@
 /* eslint-disable no-continue */
 /* global actions, api */
 
-
-
-
 actions.createSSC = async () => {
   const tableExists = await api.db.tableExists('params');
   if (tableExists === false) {
@@ -45,18 +42,16 @@ actions.updateParams = async (payload) => {   //    this function will update th
   if (api.sender !== api.owner) return;
 
    const {
-    issueTokenFee,
+    issueDTokenFee,
     updateParamsFee,
     burnUsageFee,
   } = payload;
 
-
-
   const params = await api.db.findOne('params', {});
 ;
 
-  if (issueTokenFee && typeof issueTokenFee === 'string' && !api.BigNumber(issueTokenFee).isNaN() && api.BigNumber(issueTokenFee).gte(0)) {
-    params.issueTokenFee = issueTokenFee;
+  if (issueDTokenFee && typeof issueDTokenFee === 'string' && !api.BigNumber(issueDTokenFee).isNaN() && api.BigNumber(issueDTokenFee).gte(0)) {
+    params.issueDTokenFee = issueDTokenFee;
   }
   if (updateParamsFee && typeof updateParamsFee === 'string' && !api.BigNumber(updateParamsFee).isNaN() && api.BigNumber(updateParamsFee).gte(0)) {
     params.updateParamsFee = updateParamsFee;
@@ -71,28 +66,20 @@ actions.updateParams = async (payload) => {   //    this function will update th
 
 // actions.appendTokentoD = async (payload) => { //allow a token_owner to create the new D Token
 
-//   setVerifiedIssuer = [
-//     contractName: 'tokens',
-//     contractPayload: [
 
-//     ]
-//   ]
 //   const {
 //     name, symbol, url, precision, maxSupply, isSignedWithActiveKey,
 //     callingContractInfo,
 //   } = payload;
 
 
-
-//     // get contract params
-//     const params = await api.db.findOne('params', {});
-//     const { issueDTokenFee  } = params;
+//   //   const params = await api.db.findOne('params', {});
+//   //   const { issueDTokenFee  } = params;
 
 
 //   const utilityTokenBalance = await api.db.findOne('token_balances', { account: api.sender, symbol: 'BEED' });
 
-//   const authorizedCreation = (api.BigNumber(issueDTokenFee)).lte(0)
 
-//   json.con
+//   console.log(utilityTokenBalance)
 // }
 

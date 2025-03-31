@@ -77,7 +77,7 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(tknContractPayload)));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'deploy', JSON.stringify(bdContractPayload)));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(bdContractPayload)));
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'burndollar', 'updateParams', '{ "issueTokenFee": "1200", "updateParamsFee": "200", "burnUsageFee": "2"}'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'burndollar', 'updateParams', '{ "issueDTokenFee": "1200", "updateParamsFee": "200", "burnUsageFee": "2"}'));
 
       let block = {
         refHiveBlockNumber: refBlockNumber,
@@ -103,7 +103,7 @@ describe('burndollar', function () {
 
       console.log(params);
 
-      assert.equal(params.issueTokenFee, '1200');
+      assert.equal(params.issueDTokenFee, '1200');
       assert.equal(params.updateParamsFee, '200');
       assert.equal(params.burnUsageFee, '2');
 
