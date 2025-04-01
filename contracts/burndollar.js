@@ -69,23 +69,14 @@ actions.createTokenD = async (payload) => { //allow a token_owner to create the 
   if (api.sender !== api.owner) return;
 
   const {
-    issuer, token
-    } = payload;
-
-
+    issuer, symbol, url, precision, maxSupply, isSignedWithActiveKey,
+    callingContractInfo,
+  } = payload;
 
     //    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
 
-    
-const findExistingToken = {}
-  findExistingToken.token = token;
+  const params = await api.db.findOne('params', {})
+  const {issueDTokenFee} = params
 
-  const results = api.db.findOne('token', 'balances', { account: api.sender, symbol: token })
-
-const newDtoken = {}
-  newDtoken.issuer = issuer;
-
-await api.db.insert('burnpair', newDtoken)
-
-
+const beedTokenBalance = await api.db.findOne('tokens','balances', { account: api.sender, symbol: 'BEED' } )
 }
