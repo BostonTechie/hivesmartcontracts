@@ -17,7 +17,7 @@ actions.createSSC = async () => {
     A token owner can also decide is they want the ineffiecient portion of their token conversion to be burned or go to a DAO or another account
     This routing is to be controlled by a token issuer using burn routing field om the burndollar_burnpair collection
     */
-    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'foreignCollectionId', 'parentName', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
+    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
 
     /* For a token_contract owner to issue a new -D token the price is 1000 BEED (burn).
       the smart contrart will bootstrap the -D token into existance
@@ -69,9 +69,18 @@ actions.createTokenD = async (payload) => { //allow a token_owner to create the 
   if (api.sender !== api.owner) return;
 
   const {
-    issuer,
+    issuer, token
     } = payload;
 
+
+
+    //    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
+
+    
+const findExistingToken = {}
+  findExistingToken.token = token;
+
+  const results = api.db.findOne('token', 'balances', { account: api.sender, symbol: token })
 
 const newDtoken = {}
   newDtoken.issuer = issuer;
