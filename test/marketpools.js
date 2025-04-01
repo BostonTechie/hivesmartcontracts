@@ -230,7 +230,7 @@ describe('marketpools tests', function () {
        transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'donchate', 'marketpools', 'createPool', '{ "tokenPair": "GLD:SLV", "isSignedWithActiveKey": true }'));
        transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'donchate', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "symbol": "URQ", "precision": 8, "maxSupply": "1000" }'));
        transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'donchate', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "symbol": "URRQ", "precision": 8, "maxSupply": "1000" }'));
-
+console.log(transactions[9])
       let block = {
         refHiveBlockNumber: refBlockNumber,
         refHiveBlockId: 'ABCD1',
@@ -252,7 +252,7 @@ describe('marketpools tests', function () {
         query: {}
       });
 
-      console.log(params)
+
       let res = await fixture.database.findOne({
         contract: 'marketpools',
         table: 'pools',

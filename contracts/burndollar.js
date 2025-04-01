@@ -22,9 +22,9 @@ actions.createSSC = async () => {
     /* For a token_contract owner to issue a new -D token the price is 1000 BEED (burn).
       the smart contrart will bootstrap the -D token into existance
       The underlying token must already exist using seperate established token creation smart contract.
-      token_contract owner inherits ownship of the new -D contract 
+      token_contract owner inherits ownship of the new -D contract
       after the creation of -D token if the token_contract owner wants to edit the paramaters of their -D token they can for 100 BEED (burn).
-      if the token and new -D token have sufficient liquidity pools then any user can burn xxx to get xxx-d for 1 BEED(burn). 
+      if the token and new -D token have sufficient liquidity pools then any user can burn xxx to get xxx-d for 1 BEED(burn).
       The 1 BEED(burn) is seperate from the -D token paramters set by token_contract owner, and is not subject to their edits of a token_contract owner
     */
 
@@ -34,21 +34,19 @@ actions.createSSC = async () => {
     params.burnUsageFee = '1';
     await api.db.insert('params', params);
   }
-
-
 };
 
-actions.updateParams = async (payload) => {   //    this function will update the parameters of the burndollar_params collection
+actions.updateParams = async (payload) => { //    this function will update the parameters of the burndollar_params collection
   if (api.sender !== api.owner) return;
 
-   const {
+  const {
     issueDTokenFee,
     updateParamsFee,
     burnUsageFee,
   } = payload;
 
   const params = await api.db.findOne('params', {});
-;
+
 
   if (issueDTokenFee && typeof issueDTokenFee === 'string' && !api.BigNumber(issueDTokenFee).isNaN() && api.BigNumber(issueDTokenFee).gte(0)) {
     params.issueDTokenFee = issueDTokenFee;
@@ -61,22 +59,34 @@ actions.updateParams = async (payload) => {   //    this function will update th
   }
 
   await api.db.update('params', params);
-
 };
 
-actions.createTokenD = async (payload) => { //allow a token_owner to create the new D Token
-
-  if (api.sender !== api.owner) return;
+actions.createTokenD = async (payload) => { // allow a token_owner to create the new D Token
+  // if (api.sender !== api.owner) return;
 
   const {
-    issuer, symbol, url, precision, maxSupply, isSignedWithActiveKey,
-    callingContractInfo,
+    isSignedWithActiveKey,
+
   } = payload;
 
-    //    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
+  //    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
 
-  const params = await api.db.findOne('params', {})
-  const {issueDTokenFee} = params
+  const params = await api.db.findOne('params', {});
 
-const beedTokenBalance = await api.db.findOne('tokens','balances', { account: api.sender, symbol: 'BEED' } )
-}
+  const feetoken = 'BEED';
+
+  const { issueDTokenFee } = params;
+
+  const beedTokenBalance = await api.db.findOneInTable('tokens', 'balances', { account: api.sender, symbol: feetoken });
+
+
+  const authorizedCreation = beedTokenBalance && api.BigNumber(beedTokenBalance.balance).gte(issueDTokenFee);
+
+  // Verifies that authorizedCreation is true. If not, the function will terminate and output the error message
+
+  if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')) {}
+  // not sure if I need fromVerifiedContract here or not
+  // && api.assert((isSignedWithActiveKey === true), 'you must use a custom_json signed with your active key')) {
+
+  // }
+};

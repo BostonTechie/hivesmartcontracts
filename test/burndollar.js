@@ -153,8 +153,9 @@ describe('burndollar', function () {
 
       //user must be the owner a pre-existing token that they wish to make into corresponding D token
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "100", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
-
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
+      //trans #26
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "isSignedWithActiveKey": true }'));
       
       let block = {
         refHiveBlockNumber: refBlockNumber,
@@ -172,13 +173,19 @@ describe('burndollar', function () {
       const transactionsBlock1 = block1.transactions;
 
       // check if the params updated OK
-      const params = await fixture.database.findOne({
-        contract: 'burndollar',
-        table: 'burnpair',
-        query: {}
-      });
+      // const params = await fixture.database.findOne({
+      //   contract: 'burndollar',
+      //   table: 'burnpair',
+      //   query: {}
+      // });
 
-      console.log(params);
+      // console.log(params);
+
+      const feeparams = await fixture.database.find({
+        contract: 'burndollar',
+        table: 'params',
+        query: {}
+      })
 
       const params2 = await fixture.database.find({
         contract: 'tokens',
@@ -186,16 +193,21 @@ describe('burndollar', function () {
         query: {account:'drewlongshot'}
       });
 
-      console.log(params2)
+      console.log(params2, feeparams)
 
 
-      const params3 = await fixture.database.find({
-        contract: 'tokens',
-        table: 'tokens',
-        query: {issuer:'drewlongshot'}
-      });
+      // const params3 = await fixture.database.find({
+      //   contract: 'tokens',
+      //   table: 'tokens',
+      //   query: {issuer:'drewlongshot'}
+      // });
 
-      console.log(params3)
+      // console.log(params3)
+
+      console.log(transactions[26])
+
+      console.log(JSON.parse(transactionsBlock1[26].logs));
+      assert.equal(JSON.parse(transactionsBlock1[26].logs).errors[0], 'you must have enough tokens to cover the creation fees');
 
       resolve();
     })
