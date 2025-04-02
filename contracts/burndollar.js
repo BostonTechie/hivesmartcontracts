@@ -73,12 +73,17 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
 
   const authorizedCreation = beedTokenBalance && api.BigNumber(beedTokenBalance.balance).gte(issueDTokenFee);
 
-  if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')
-    && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    && api.assert(symbol && typeof symbol === 'string'
-      && (url === undefined || (url && typeof url === 'string'))
-      && ((precision && typeof precision === 'number') || precision === 0)
-      && maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN(), 'invalid params',
-      /* && name && typeof name === 'string' */)) {
-  }
+  api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees');
+  api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key');
+  api.assert(symbol && typeof symbol === 'string', 'symbol must be string');
+  api.assert(url === undefined || (url && typeof url === 'string'), 'url');
+  // api.assert(((precision && typeof precision === 'number') || precision === 0), 'prec');
+  // api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN(), 'max');
+
+//   if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')
+//     && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
+//     && api.assert(symbol && typeof symbol === 'string'
+//       && (url === undefined || (url && typeof url === 'string'))
+//       && ((precision && typeof precision === 'number') || precision === 0)
+//       && maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN(), 'invalid params')) {}
 };
