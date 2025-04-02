@@ -172,7 +172,19 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "THR", "url": 123 , "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans 37 user must be issuer on the Parent token
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "BEE", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
-
+      // trans38 the parent token is set to burn to null by default, but a user can send it to any other account
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "burnRouting": 123, "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+      // trans39 the min convertable amount has to be a string(value) of at least 1
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "minConvertableAmount": "0", "burnRouting": "aggroed", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+       // trans40 fee conversion rate must be between 0 and 100% as a decimal
+       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": "1.1","minConvertableAmount": "1", "burnRouting": "aggroed", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+       // trans41 the account for routing the fee portion of a converion must exist
+       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "burnRouting": "aggroedthesmall", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+      //trans 42+43 the name XXX-D token already exists
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'tokens', 'issue', '{ "symbol": "URQTEST-D", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "burnRouting": "aggroed", "url": "myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+      
+      
       let block = {
         refHiveBlockNumber: refBlockNumber,
         refHiveBlockId: 'ABCD1',
@@ -188,7 +200,7 @@ describe('burndollar', function () {
       const block1 = res;
       const transactionsBlock1 = block1.transactions;
 
-
+      console.log(transactions[43])
       console.log(" ")
       console.log( '\u001b[' + 93 + 'm' + 'Test: generates errors when trying to issue D tokens with wrong parameters' + '\u001b[0m')
       console.log("  ⚪",JSON.parse(transactionsBlock1[26].logs).errors[0])
@@ -202,6 +214,11 @@ describe('burndollar', function () {
       console.log("  ⚪",JSON.parse(transactionsBlock1[35].logs).errors[0],"... maxSupply must be lower than ")
       console.log("  ⚪",JSON.parse(transactionsBlock1[36].logs).errors[0],"... url must be a string ")
       console.log("  ⚪",JSON.parse(transactionsBlock1[37].logs).errors[0],"... user not token parent issure ")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[38].logs).errors[0],"... burn routing must be a string and is set to null by default ")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[39].logs).errors[0],"... min convertable amount must equal 1 ")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[40].logs).errors[0],"... fee percent must be btwn 0 and 1 ")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[41].logs).errors[0],"... does account exist")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[43].logs).errors[0],"... XXX-D already exists")
       
       assert.equal(JSON.parse(transactionsBlock1[26].logs).errors[0], 'you must have enough tokens to cover the creation fees');
       assert.equal(JSON.parse(transactionsBlock1[28].logs).errors[0], 'you must use a custom_json signed with your active key');
@@ -212,8 +229,13 @@ describe('burndollar', function () {
       assert.equal(JSON.parse(transactionsBlock1[33].logs).errors[0], 'maxSupply must be positive string(number)');
       assert.equal(JSON.parse(transactionsBlock1[34].logs).errors[0], 'maxSupply must be positive string(number)');
       assert.equal(JSON.parse(transactionsBlock1[35].logs).errors[0], `maxSupply must be lower than ${Number.MAX_SAFE_INTEGER}`);
-      assert.equal(JSON.parse(transactionsBlock1[36].logs).errors[0], `invalid url`);
+      assert.equal(JSON.parse(transactionsBlock1[36].logs).errors[0], `invalid url must be string of less thna 255 chars`);
       assert.equal(JSON.parse(transactionsBlock1[37].logs).errors[0], `You must be the token issuer in order to issue D token`);
+      assert.equal(JSON.parse(transactionsBlock1[38].logs).errors[0], `burn routing must be string`);
+      assert.equal(JSON.parse(transactionsBlock1[39].logs).errors[0], `min convert amount must be string(number) greater than 1`);
+      assert.equal(JSON.parse(transactionsBlock1[40].logs).errors[0], `fee percentage must be between 0 and 1 / 0% and 100%`);
+      assert.equal(JSON.parse(transactionsBlock1[41].logs).errors[0], `account for burn routing must exist`);
+
 
       resolve();
     })

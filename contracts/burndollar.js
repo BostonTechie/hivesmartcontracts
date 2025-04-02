@@ -80,16 +80,23 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
    && api.assert((precision && typeof precision === 'number') && (precision >= 0 && precision <= 8) && (Number.isInteger(precision)), 'invalid precision must be number between 0 and 8')
    && api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN() && api.BigNumber(maxSupply).gt(0), 'maxSupply must be positive string(number)')
    && api.assert(api.BigNumber(maxSupply).lte(Number.MAX_SAFE_INTEGER), `maxSupply must be lower than ${Number.MAX_SAFE_INTEGER}`)
-   && api.assert(url === undefined || (typeof url === 'string'), 'invalid url')) {
+   && api.assert(url === undefined || (typeof url === 'string') || url.length <= 255, 'invalid url must be string of less thna 255 chars')) {
     // ensure the user issuing D token is owner of the parent pair token
     const tokenIssuer = await api.db.findOneInTable('tokens', 'tokens', { issuer: api.sender, symbol });
+    const dsymbol = `${symbol}-D`;
+    const tokenDExists = await api.db.findOneInTable('tokens', 'tokens', { symbol: dsymbol });
 
-    if (burnRouting === undefined) {
-      const burnRouting = null;
-    }
 
     if (api.assert(tokenIssuer !== null, 'You must be the token issuer in order to issue D token')
-    && api.assert(burnRouting === null || (typeof url === 'string'), burnRouting)) {}
-    // ensure the user issuing D token is owner of the parent pair token
+    // && api.assert(tokenDExists !== null, 'The D token name is taken')
+    && api.assert(burnRouting === null || (typeof burnRouting === 'string'), 'burn routing must be string')
+    && api.assert(minConvertableAmount && typeof minConvertableAmount === 'string' && !api.BigNumber(minConvertableAmount).isNaN() && api.BigNumber(minConvertableAmount).gte(1), 'min convert amount must be string(number) greater than 1')
+    && api.assert(feePercentage && typeof feePercentage === 'string' && !api.BigNumber(feePercentage).isNaN() && api.BigNumber(feePercentage).gte(0) && api.BigNumber(feePercentage).lte(1), 'fee percentage must be between 0 and 1 / 0% and 100%')
+    ) {
+      const burnAccount = await api.db.findOneInTable('tokens', 'balances', { account: burnRouting });
+      if (api.assert(burnAccount !== null, 'account for burn routing must exist')) {
+
+      }
+    }
   }
 };
