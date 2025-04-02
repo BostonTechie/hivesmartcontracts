@@ -10,6 +10,7 @@ const { setupContractPayload } = require('../libs/util/contractUtil');
 const { Fixture, conf } = require('../libs/util/testing/Fixture');
 const { TableAsserts } = require('../libs/util/testing/TableAsserts');
 const { assertError } = require('../libs/util/testing/Asserts');
+const { query } = require('winston');
 
 
 const tknContractPayload = setupContractPayload('tokens', './contracts/tokens.js');
@@ -117,7 +118,7 @@ describe('burndollar', function () {
   // });
 
 
-  it('uses my new function', (done) => {
+  it('generates errors when trying to issue D tokens with wrong parameters', (done) => {
     new Promise(async (resolve) => {
 
       await fixture.setUp();
@@ -147,16 +148,26 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'marketpools', 'addLiquidity', '{ "tokenPair": "SWAP.HIVE:SWAP.HBD", "baseQuantity": "20000", "quoteQuantity": "200", "maxDeviation": "0", "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'marketpools', 'swapTokens', '{ "tokenPair": "SWAP.HIVE:BEE", "tokenSymbol": "SWAP.HIVE", "tokenAmount": "5", "tradeType": "exactOutput", "isSignedWithActiveKey": true}'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'marketpools', 'swapTokens', '{ "tokenPair": "SWAP.HIVE:SWAP.HBD", "tokenSymbol": "SWAP.HBD", "tokenAmount": "5", "tradeType": "exactOutput", "isSignedWithActiveKey": true}'));
-
       // now, do a convert from bee to beed
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "2000.0", "isSignedWithActiveKey": true }'));
-
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "200.0", "isSignedWithActiveKey": true }'));
       //user must be the owner a pre-existing token that they wish to make into corresponding D token
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
       //trans #26
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "isSignedWithActiveKey": true }'));
-      
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "2000.0", "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "isSignedWithActiveKey": false }'));
+      //trans29 symbol must be string
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "156","isSignedWithActiveKey": true }'));
+      //trans30 + 31 symbol must be string and not be undefined
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "TOKED","url": "undefined", "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "TOKED","url": "123", "isSignedWithActiveKey": true }'));
+      //trans32 + 33 precision must be number
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "TOKED",  "precision": "TOKED", "url": "happy.com", "isSignedWithActiveKey": true }'));
+       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "TOKED", "precision": "0", "url": "happy.com", "isSignedWithActiveKey": true }'));
+
+
+
       let block = {
         refHiveBlockNumber: refBlockNumber,
         refHiveBlockId: 'ABCD1',
@@ -172,42 +183,32 @@ describe('burndollar', function () {
       const block1 = res;
       const transactionsBlock1 = block1.transactions;
 
-      // check if the params updated OK
-      // const params = await fixture.database.findOne({
-      //   contract: 'burndollar',
-      //   table: 'burnpair',
-      //   query: {}
-      // });
 
-      // console.log(params);
+    // const res1 = await fixture.database.find({
+    //   contract: 'tokens',
+    //   table: 'tokens',
+    //   query: {}
+    // });
 
-      const feeparams = await fixture.database.find({
-        contract: 'burndollar',
-        table: 'params',
-        query: {}
-      })
-
-      const params2 = await fixture.database.find({
-        contract: 'tokens',
-        table: 'balances',
-        query: {account:'drewlongshot'}
-      });
-
-      console.log(params2, feeparams)
-
-
-      // const params3 = await fixture.database.find({
-      //   contract: 'tokens',
-      //   table: 'tokens',
-      //   query: {issuer:'drewlongshot'}
-      // });
-
-      // console.log(params3)
-
-      console.log(transactions[26])
-
-      console.log(JSON.parse(transactionsBlock1[26].logs));
+    // console.log(res1)
+      console.log(" ")
+      console.log( '\u001b[' + 93 + 'm' + 'Test: generates errors when trying to issue D tokens with wrong parameters' + '\u001b[0m')
+      console.log("  ⚪",JSON.parse(transactionsBlock1[26].logs).errors[0])
+      console.log("  ⚪",JSON.parse(transactionsBlock1[28].logs).errors[0])
+      console.log("  ⚪",JSON.parse(transactionsBlock1[29].logs).errors[0],"... the symbol must be string")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[30].logs).errors[0],"... Url cannot be undefined")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[31].logs).errors[0],"... Url must be string")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[32].logs).errors[0],"... precision must be number")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[33].logs).errors[0],"... precision not be zero")
+      
       assert.equal(JSON.parse(transactionsBlock1[26].logs).errors[0], 'you must have enough tokens to cover the creation fees');
+      assert.equal(JSON.parse(transactionsBlock1[28].logs).errors[0], 'you must use a custom_json signed with your active key');
+      assert.equal(JSON.parse(transactionsBlock1[29].logs).errors[0], 'invalid params');
+      assert.equal(JSON.parse(transactionsBlock1[30].logs).errors[0], 'invalid params');
+      assert.equal(JSON.parse(transactionsBlock1[31].logs).errors[0], 'invalid params');
+      assert.equal(JSON.parse(transactionsBlock1[32].logs).errors[0], 'invalid params');
+      assert.equal(JSON.parse(transactionsBlock1[33].logs).errors[0], 'invalid params');
+
 
       resolve();
     })

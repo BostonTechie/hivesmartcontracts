@@ -62,31 +62,23 @@ actions.updateParams = async (payload) => { //    this function will update the 
 };
 
 actions.createTokenD = async (payload) => { // allow a token_owner to create the new D Token
-  // if (api.sender !== api.owner) return;
-
-  const {
-    isSignedWithActiveKey,
-
+  const { // not sure if I need name for blacklist or callingContractInfo
+    symbol, url, precision, maxSupply, isSignedWithActiveKey,
   } = payload;
 
-  //    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
-
   const params = await api.db.findOne('params', {});
-
-  const feetoken = 'BEED';
-
   const { issueDTokenFee } = params;
 
-  const beedTokenBalance = await api.db.findOneInTable('tokens', 'balances', { account: api.sender, symbol: feetoken });
-
+  const beedTokenBalance = await api.db.findOneInTable('tokens', 'balances', { account: api.sender, symbol: 'BEED' });
 
   const authorizedCreation = beedTokenBalance && api.BigNumber(beedTokenBalance.balance).gte(issueDTokenFee);
 
-  // Verifies that authorizedCreation is true. If not, the function will terminate and output the error message
-
-  if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')) {}
-  // not sure if I need fromVerifiedContract here or not
-  // && api.assert((isSignedWithActiveKey === true), 'you must use a custom_json signed with your active key')) {
-
-  // }
+  if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')
+    && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
+    && api.assert(symbol && typeof symbol === 'string'
+      && (url === undefined || (url && typeof url === 'string'))
+      && ((precision && typeof precision === 'number') || precision === 0)
+      && maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN(), 'invalid params',
+      /* && name && typeof name === 'string' */)) {
+  }
 };
