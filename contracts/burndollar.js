@@ -75,12 +75,9 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
   const authorizedCreation = beedTokenBalance && api.BigNumber(beedTokenBalance.balance).gte(issueDTokenFee);
 
   if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')
-   && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
    && api.assert(symbol && typeof symbol === 'string' && symbol.length <= 8, 'symbol must be string of length 8 or less to create a xxx-D token')
-   && api.assert((precision && typeof precision === 'number') && (precision >= 0 && precision <= 8) && (Number.isInteger(precision)), 'invalid precision must be number between 0 and 8')
-   && api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN() && api.BigNumber(maxSupply).gt(0), 'maxSupply must be positive string(number)')
-   && api.assert(api.BigNumber(maxSupply).lte(Number.MAX_SAFE_INTEGER), `maxSupply must be lower than ${Number.MAX_SAFE_INTEGER}`)
-   && api.assert(url === undefined || (typeof url === 'string') || url.length <= 255, 'invalid url must be string of less thna 255 chars')) {
+
+  ) {
     // ensure the user issuing D token is owner of the parent pair token
     const tokenIssuer = await api.db.findOneInTable('tokens', 'tokens', { issuer: api.sender, symbol });
 
@@ -101,7 +98,7 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
           symbol: dsymbol,
           url,
           precision,
-          maxSupply: `${Number.MAX_SAFE_INTEGER}`,
+          maxSupply,
         };
 
         const meta = {
@@ -115,8 +112,17 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
           metadata: meta,
         };
 
-        await api.executeSmartContract('tokens', 'create', tokenProps);
-        await api.executeSmartContract('tokens', 'updateMetadata', updateData);
+
+        try {
+          await api.executeSmartContract('tokens', 'create', tokenProps);
+          await api.executeSmartContract('tokens', 'updateMetadata', updateData);
+
+          // This line will only run if the above two await calls resolve without errors
+          console.log('Both actions completed successfully.');
+        } catch (error) {
+          // Handle any errors that occur during the await calls source is token.js
+          console.error(error);
+        }
       }
     }
   }

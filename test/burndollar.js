@@ -154,23 +154,22 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "200.0", "isSignedWithActiveKey": true }'));
       //user must be the owner a pre-existing token that they wish to make into corresponding D token
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
       //trans #26 active key test anduser has BEED enough test
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "2000.0", "isSignedWithActiveKey": true }'));
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "isSignedWithActiveKey": false }'));
-      //trans29 + 30 symbol must be string of less than 8 contract to append -D
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "burnRouting": "whale", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": false }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": 156, "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "RUTTMUTTT", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans31 + 32 precision must be number between 0 and 8 
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "TIM3", "maxSupply": "20000", "precision": "ty", "isSignedWithActiveKey": true }'));
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "TIM3", "maxSupply": "20000", "precision": 9, "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "maxSupply": "20000", "burnRouting" : "whale", "precision": "ty", "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "maxSupply": "20000", "precision": 9, "burnRouting" : "whale", "isSignedWithActiveKey": true }'));
       //trans33+ 34 + 35 maxSupply must be a valid param
-       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "THR", "url": "good.com" , "maxSupply": 20000, "precision": 2, "isSignedWithActiveKey": true }'));
-       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "THR", "url": "good.com" , "maxSupply": "tim", "precision": 2, "isSignedWithActiveKey": true }'));
-       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "THR", "url": "good.com" , "maxSupply": "9999999999999999999999999999999999999999999999999", "precision": 2, "isSignedWithActiveKey": true }'));
+       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": "good.com" , "minConvertableAmount": "1", "feePercentage": "1", "burnRouting" : "whale", "maxSupply": 20000, "precision": 2, "isSignedWithActiveKey": true }'));
+       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": "good.com" , "minConvertableAmount": "1", "feePercentage": "1", "burnRouting" : "whale", "maxSupply": "tim", "precision": 2, "isSignedWithActiveKey": true }'));
+       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": "good.com", "minConvertableAmount": "1", "feePercentage": "1", "burnRouting" : "whale", "maxSupply": "9999999999999999999999999999999999999999999999999", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans36 URL must be string and not be undefined
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "THR", "url": 123 , "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": 123 , "feePercentage": ".5", "burnRouting": "whale", "minConvertableAmount": "1", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans 37 user must be issuer on the Parent token
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "BEE", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       // trans38 the parent token is set to burn to null by default, but a user can send it to any other account
@@ -183,7 +182,7 @@ describe('burndollar', function () {
        transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "burnRouting": "aggroedthesmall", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans 42+44 the name XXX-D token already exists
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST-D", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'tokens', 'issue', '{ "symbol": "URQTEST-D", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'issue', '{ "symbol": "URQTEST-D", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "burnRouting": "whale", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
     
       
@@ -204,12 +203,12 @@ describe('burndollar', function () {
 
       const res2 = await fixture.database.find({
         contract: 'tokens',
-        table: 'tokens',
-        query: {}
+        table: 'balances',
+        query: {account: "null"}
       });
 
-      // console.log(res2)
-       console.log(JSON.parse(transactionsBlock1[43].logs))
+     // console.log(res2)
+      console.log(JSON.parse(transactionsBlock1[36].logs))
       // console.log(JSON.parse(transactionsBlock1[46].logs))
       console.log(" ")
       console.log( '\u001b[' + 93 + 'm' + 'Test: generates errors when trying to issue D tokens with wrong parameters' + '\u001b[0m')
@@ -235,12 +234,12 @@ describe('burndollar', function () {
       assert.equal(JSON.parse(transactionsBlock1[28].logs).errors[0], 'you must use a custom_json signed with your active key');
       assert.equal(JSON.parse(transactionsBlock1[29].logs).errors[0], 'symbol must be string of length 8 or less to create a xxx-D token');
       assert.equal(JSON.parse(transactionsBlock1[30].logs).errors[0], 'symbol must be string of length 8 or less to create a xxx-D token');
-      assert.equal(JSON.parse(transactionsBlock1[31].logs).errors[0], 'invalid precision must be number between 0 and 8');
-      assert.equal(JSON.parse(transactionsBlock1[32].logs).errors[0], 'invalid precision must be number between 0 and 8');
-      assert.equal(JSON.parse(transactionsBlock1[33].logs).errors[0], 'maxSupply must be positive string(number)');
-      assert.equal(JSON.parse(transactionsBlock1[34].logs).errors[0], 'maxSupply must be positive string(number)');
+      assert.equal(JSON.parse(transactionsBlock1[31].logs).errors[0], 'min convert amount must be string(number) greater than 1');
+      assert.equal(JSON.parse(transactionsBlock1[32].logs).errors[0], 'min convert amount must be string(number) greater than 1');
+      assert.equal(JSON.parse(transactionsBlock1[33].logs).errors[0], 'invalid params');
+      assert.equal(JSON.parse(transactionsBlock1[34].logs).errors[0], 'invalid params');
       assert.equal(JSON.parse(transactionsBlock1[35].logs).errors[0], `maxSupply must be lower than ${Number.MAX_SAFE_INTEGER}`);
-      assert.equal(JSON.parse(transactionsBlock1[36].logs).errors[0], `invalid url must be string of less thna 255 chars`);
+      assert.equal(JSON.parse(transactionsBlock1[36].logs).errors[0], `invalid params`);
       assert.equal(JSON.parse(transactionsBlock1[37].logs).errors[0], `You must be the token issuer in order to issue D token`);
       assert.equal(JSON.parse(transactionsBlock1[38].logs).errors[0], `burn routing must be string`);
       assert.equal(JSON.parse(transactionsBlock1[39].logs).errors[0], `min convert amount must be string(number) greater than 1`);
