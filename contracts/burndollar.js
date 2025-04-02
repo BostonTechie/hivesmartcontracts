@@ -82,6 +82,7 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
 
   if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')
     && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
+    && api.assert(symbol && typeof symbol === 'string' && symbol.length <= 8, 'symbol must be string of length 8 or less to create a xxx-D token')
     && api.assert(symbol && typeof symbol === 'string'
       && (url === undefined || (url && typeof url === 'string'))
       && ((precision && typeof precision === 'number') || precision === 0)
