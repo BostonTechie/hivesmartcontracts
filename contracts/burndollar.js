@@ -73,18 +73,11 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
 
   const authorizedCreation = beedTokenBalance && api.BigNumber(beedTokenBalance.balance).gte(issueDTokenFee);
 
-  // api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees');
-  // api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key');
-  // api.assert(symbol && typeof symbol === 'string', 'symbol must be string');
-  // api.assert(url === undefined || (url && typeof url === 'string'), 'url');
-  // api.assert(((precision && typeof precision === 'number') || precision === 0), 'prec');
-  // api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN(), 'max');
-
   if (api.assert(authorizedCreation, 'you must have enough tokens to cover the creation fees')
-    && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    && api.assert(symbol && typeof symbol === 'string' && symbol.length <= 8, 'symbol must be string of length 8 or less to create a xxx-D token')
-    && api.assert(symbol && typeof symbol === 'string'
-      && (url === undefined || (url && typeof url === 'string'))
-      && ((precision && typeof precision === 'number') || precision === 0)
-      && maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN(), 'invalid params')) {}
+   && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
+   && api.assert(symbol && typeof symbol === 'string' && symbol.length <= 8, 'symbol must be string of length 8 or less to create a xxx-D token')
+   && api.assert((precision && typeof precision === 'number') && (precision >= 0 && precision <= 8) && (Number.isInteger(precision)), 'invalid precision must be number between 0 and 8')
+   && api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN() && api.BigNumber(maxSupply).gt(0), 'maxSupply must be positive string(number)')
+   && api.assert(api.BigNumber(maxSupply).lte(Number.MAX_SAFE_INTEGER), `maxSupply must be lower than ${Number.MAX_SAFE_INTEGER}`)
+   && api.assert(url === undefined || (typeof url === 'string'), 'invalid url')) {}
 };
