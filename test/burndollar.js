@@ -69,53 +69,54 @@ describe('burndollar', function () {
       })
   });
 
-  // it('updates parameters on the fee charges in the burndollar contract', (done) => {
-  //   new Promise(async (resolve) => {
+  it('updates parameters on the fee charges in the burndollar contract', (done) => {
+    new Promise(async (resolve) => {
 
-  //     await fixture.setUp();
+      await fixture.setUp();
 
-  //     let refBlockNumber = fixture.getNextRefBlockNumber();
-  //     let transactions = [];
-  //     transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(tknContractPayload)));
-  //     transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'deploy', JSON.stringify(bdContractPayload)));
-  //     transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(bdContractPayload)));
-  //     transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'burndollar', 'updateParams', '{ "issueDTokenFee": "1200", "updateParamsFee": "200", "burnUsageFee": "2"}'));
+      let refBlockNumber = fixture.getNextRefBlockNumber();
+      let transactions = [];
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(tknContractPayload)));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'deploy', JSON.stringify(bdContractPayload)));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'contract', 'update', JSON.stringify(bdContractPayload)));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), CONSTANTS.HIVE_ENGINE_ACCOUNT, 'burndollar', 'updateParams', '{ "issueDTokenFee": "1200", "updateParamsFee": "200", "burnUsageFee": "2"}'));
 
-  //     let block = {
-  //       refHiveBlockNumber: refBlockNumber,
-  //       refHiveBlockId: 'ABCD1',
-  //       prevRefHiveBlockId: 'ABCD2',
-  //       timestamp: '2018-06-01T00:00:00',
-  //       transactions,
-  //     };
+      let block = {
+        refHiveBlockNumber: refBlockNumber,
+        refHiveBlockId: 'ABCD1',
+        prevRefHiveBlockId: 'ABCD2',
+        timestamp: '2018-06-01T00:00:00',
+        transactions,
+      };
 
-  //     await fixture.sendBlock(block);
+      await fixture.sendBlock(block);
 
-  //     const res = await fixture.database.getBlockInfo(1);
+      const res = await fixture.database.getBlockInfo(1);
 
-  //     const block1 = res;
-  //     const transactionsBlock1 = block1.transactions;
+      const block1 = res;
+      const transactionsBlock1 = block1.transactions;
 
-  //     // check if the params updated OK
-  //     const params = await fixture.database.findOne({
-  //       contract: 'burndollar',
-  //       table: 'params',
-  //       query: {}
-  //     });
+      // check if the params updated OK
+      const params = await fixture.database.findOne({
+        contract: 'burndollar',
+        table: 'params',
+        query: {}
+      });
 
-  //     console.log(params);
+      console.log(" ")
+      console.log( '\u001b[' + 93 + 'm' + 'Test: updates parameters on the fee charges in the burndollar contract' + '\u001b[0m')
 
-  //     assert.equal(params.issueDTokenFee, '1200');
-  //     assert.equal(params.updateParamsFee, '200');
-  //     assert.equal(params.burnUsageFee, '2');
+      assert.equal(params.issueDTokenFee, '1200');
+      assert.equal(params.updateParamsFee, '200');
+      assert.equal(params.burnUsageFee, '2');
 
-  //     resolve();
-  //   })
-  //     .then(() => {
-  //       fixture.tearDown();
-  //       done();
-  //     });
-  // });
+      resolve();
+    })
+      .then(() => {
+        fixture.tearDown();
+        done();
+      });
+  });
 
 
   it('generates errors when trying to issue D tokens with wrong parameters', (done) => {
@@ -169,7 +170,9 @@ describe('burndollar', function () {
        transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "THR", "url": "good.com" , "maxSupply": "9999999999999999999999999999999999999999999999999", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans36 URL must be string and not be undefined
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "THR", "url": 123 , "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
-      
+      //trans 37 user must be issuer on the Parent token
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "BEE", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+
       let block = {
         refHiveBlockNumber: refBlockNumber,
         refHiveBlockId: 'ABCD1',
@@ -184,7 +187,7 @@ describe('burndollar', function () {
 
       const block1 = res;
       const transactionsBlock1 = block1.transactions;
-      console.log(transactions[36])
+
 
       console.log(" ")
       console.log( '\u001b[' + 93 + 'm' + 'Test: generates errors when trying to issue D tokens with wrong parameters' + '\u001b[0m')
@@ -198,10 +201,7 @@ describe('burndollar', function () {
       console.log("  ⚪",JSON.parse(transactionsBlock1[34].logs).errors[0],"... maxsupply must be string(of number)")
       console.log("  ⚪",JSON.parse(transactionsBlock1[35].logs).errors[0],"... maxSupply must be lower than ")
       console.log("  ⚪",JSON.parse(transactionsBlock1[36].logs).errors[0],"... url must be a string ")
-
-
-     
-
+      console.log("  ⚪",JSON.parse(transactionsBlock1[37].logs).errors[0],"... user not token parent issure ")
       
       assert.equal(JSON.parse(transactionsBlock1[26].logs).errors[0], 'you must have enough tokens to cover the creation fees');
       assert.equal(JSON.parse(transactionsBlock1[28].logs).errors[0], 'you must use a custom_json signed with your active key');
@@ -213,8 +213,7 @@ describe('burndollar', function () {
       assert.equal(JSON.parse(transactionsBlock1[34].logs).errors[0], 'maxSupply must be positive string(number)');
       assert.equal(JSON.parse(transactionsBlock1[35].logs).errors[0], `maxSupply must be lower than ${Number.MAX_SAFE_INTEGER}`);
       assert.equal(JSON.parse(transactionsBlock1[36].logs).errors[0], `invalid url`);
-
-
+      assert.equal(JSON.parse(transactionsBlock1[37].logs).errors[0], `You must be the token issuer in order to issue D token`);
 
       resolve();
     })

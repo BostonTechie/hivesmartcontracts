@@ -51,6 +51,7 @@ actions.updateParams = async (payload) => { //    this function will update the 
   if (issueDTokenFee && typeof issueDTokenFee === 'string' && !api.BigNumber(issueDTokenFee).isNaN() && api.BigNumber(issueDTokenFee).gte(0)) {
     params.issueDTokenFee = issueDTokenFee;
   }
+
   if (updateParamsFee && typeof updateParamsFee === 'string' && !api.BigNumber(updateParamsFee).isNaN() && api.BigNumber(updateParamsFee).gte(0)) {
     params.updateParamsFee = updateParamsFee;
   }
@@ -63,7 +64,7 @@ actions.updateParams = async (payload) => { //    this function will update the 
 
 actions.createTokenD = async (payload) => { // allow a token_owner to create the new D Token
   const { // not sure if I need name for blacklist or callingContractInfo
-    symbol, url, precision, maxSupply, isSignedWithActiveKey,
+    symbol, url, precision, maxSupply, isSignedWithActiveKey, burnRouting, minConvertableAmount, feePercentage,
   } = payload;
 
   const params = await api.db.findOne('params', {});
@@ -79,5 +80,16 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
    && api.assert((precision && typeof precision === 'number') && (precision >= 0 && precision <= 8) && (Number.isInteger(precision)), 'invalid precision must be number between 0 and 8')
    && api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN() && api.BigNumber(maxSupply).gt(0), 'maxSupply must be positive string(number)')
    && api.assert(api.BigNumber(maxSupply).lte(Number.MAX_SAFE_INTEGER), `maxSupply must be lower than ${Number.MAX_SAFE_INTEGER}`)
-   && api.assert(url === undefined || (typeof url === 'string'), 'invalid url')) {}
+   && api.assert(url === undefined || (typeof url === 'string'), 'invalid url')) {
+    // ensure the user issuing D token is owner of the parent pair token
+    const tokenIssuer = await api.db.findOneInTable('tokens', 'tokens', { issuer: api.sender, symbol });
+
+    if (burnRouting === undefined) {
+      const burnRouting = null;
+    }
+
+    if (api.assert(tokenIssuer !== null, 'You must be the token issuer in order to issue D token')
+    && api.assert(burnRouting === null || (typeof url === 'string'), burnRouting)) {}
+    // ensure the user issuing D token is owner of the parent pair token
+  }
 };
