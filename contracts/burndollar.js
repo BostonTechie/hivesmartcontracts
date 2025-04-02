@@ -94,11 +94,11 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
       const dsymbol = `${symbol}-D`;
       const tokenDExists = await api.db.findOneInTable('tokens', 'tokens', { symbol: dsymbol });
       if (api.assert(burnAccount !== null, 'account for burn routing must exist')
-        && api.assert(tokenDExists !== null, 'The D token name is taken')
+        && api.assert(tokenDExists === null, 'D token must not already exist')
       ) { // bootstrap the BEED token into existence
         const tokenProps = {
-          name: 'BeeD',
-          dsymbol,
+          name: 'fgfg',
+          symbol: dsymbol,
           url,
           precision,
           maxSupply: `${Number.MAX_SAFE_INTEGER}`,
@@ -111,7 +111,7 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
         };
 
         const updateData = {
-          symbol,
+          symbol: dsymbol,
           metadata: meta,
         };
 

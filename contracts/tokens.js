@@ -51,7 +51,7 @@ const VERIFIED_ISSUERS = [
   'mining',
   'tokenfunds',
   'beedollar',
-  'burndollar'
+  'burndollar',
 ];
 
 const calculateBalance = (balance, quantity, precision, add) => (add
@@ -377,7 +377,7 @@ actions.create = async (payload) => {
     if (api.assert(
       symbol.length > 0
       && symbol.length <= 10
-      && api.validator.isAlpha(api.validator.blacklist(symbol, '.'))
+      && api.validator.isAlpha(api.validator.blacklist(symbol, '.-'))
       && api.validator.isUppercase(symbol)
       && (symbol.indexOf('.') === -1
         || (symbol.indexOf('.') > 0
