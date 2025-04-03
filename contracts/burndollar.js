@@ -17,7 +17,7 @@ actions.createSSC = async () => {
     A token owner can also decide is they want the ineffiecient portion of their token conversion to be burned or go to a DAO or another account
     This routing is to be controlled by a token issuer using burn routing field om the burndollar_burnpair collection
     */
-    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentiId', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
+    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentSymbol', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
 
     /* For a token_contract owner to issue a new -D token the price is 1000 BEED (burn).
       the smart contrart will bootstrap the -D token into existance
@@ -64,7 +64,7 @@ actions.updateParams = async (payload) => { //    this function will update the 
 
 actions.createTokenD = async (payload) => { // allow a token_owner to create the new D Token
   const { // not sure if I need name for blacklist or callingContractInfo
-    symbol, url, precision, maxSupply, isSignedWithActiveKey, burnRouting, minConvertableAmount, feePercentage,
+    name, symbol, url, precision, maxSupply, isSignedWithActiveKey, burnRouting, minConvertableAmount, feePercentage, icon, desc,
   } = payload;
 
   const params = await api.db.findOne('params', {});
@@ -83,18 +83,19 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
 
 
     if (api.assert(tokenIssuer !== null, 'You must be the token issuer in order to issue D token')
-    && api.assert(burnRouting === null || (typeof burnRouting === 'string'), 'burn routing must be string')
+    && api.assert(burnRouting === undefined || (typeof burnRouting === 'string'), 'burn routing must be string')
     && api.assert(minConvertableAmount && typeof minConvertableAmount === 'string' && !api.BigNumber(minConvertableAmount).isNaN() && api.BigNumber(minConvertableAmount).gte(1), 'min convert amount must be string(number) greater than 1')
     && api.assert(feePercentage && typeof feePercentage === 'string' && !api.BigNumber(feePercentage).isNaN() && api.BigNumber(feePercentage).gte(0) && api.BigNumber(feePercentage).lte(1), 'fee percentage must be between 0 and 1 / 0% and 100%')
     ) {
       const burnAccount = await api.db.findOneInTable('tokens', 'balances', { account: burnRouting });
-      const dsymbol = `${symbol}-D`;
+      const dsymbol = `${symbol}D`;
       const tokenDExists = await api.db.findOneInTable('tokens', 'tokens', { symbol: dsymbol });
       if (api.assert(burnAccount !== null, 'account for burn routing must exist')
         && api.assert(tokenDExists === null, 'D token must not already exist')
-      ) { // bootstrap the BEED token into existence
+      ) { // bootstrap the xxx.D token into existence
         const tokenProps = {
-          name: 'fgfg',
+          isSignedWithActiveKey,
+          name,
           symbol: dsymbol,
           url,
           precision,
@@ -103,8 +104,8 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
 
         const meta = {
           url,
-          icon: 'https://cdn.tribaldex.com/tribaldex/token-icons/BEE.png',
-          desc: 'BEED is the native stablecoin for the Hive Engine platform. You can mint new BEED by burning BEE.',
+          icon,
+          desc,
         };
 
         const updateData = {
@@ -114,8 +115,24 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
 
 
         try {
-          await api.executeSmartContract('tokens', 'create', tokenProps);
-          await api.executeSmartContract('tokens', 'updateMetadata', updateData);
+          const finalRouting = burnRouting === undefined ? null : burnRouting;
+
+          const burnPairParams = {
+            issuer: api.sender,
+            symbol: dsymbol,
+            name,
+            parentSymbol: symbol,
+            burnRouting: finalRouting,
+            minConvertableAmount,
+            feePercentage,
+          };
+
+          await api.db.insert('burnpair', burnPairParams);
+
+
+          // await api.executeSmartContract('tokens', 'create', tokenProps);
+          // await api.executeSmartContract('tokens', 'updateMetadata', updateData);
+
 
           // This line will only run if the above two await calls resolve without errors
           console.log('Both actions completed successfully.');

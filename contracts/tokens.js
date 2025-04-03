@@ -352,7 +352,7 @@ actions.create = async (payload) => {
   const params = await api.db.findOne('params', {});
   const { tokenCreationFee, heAccounts } = params;
 
-  const fromVerifiedContract = (api.sender === 'hive-engine'
+  const fromVerifiedContract = ((api.sender === 'hive-engine' || api.sender === 'burndollar')
       && callingContractInfo
       && VERIFIED_ISSUERS.indexOf(callingContractInfo.name) !== -1);
 
@@ -377,7 +377,7 @@ actions.create = async (payload) => {
     if (api.assert(
       symbol.length > 0
       && symbol.length <= 10
-      && api.validator.isAlpha(api.validator.blacklist(symbol, '.-'))
+      && api.validator.isAlpha(api.validator.blacklist(symbol, '.'))
       && api.validator.isUppercase(symbol)
       && (symbol.indexOf('.') === -1
         || (symbol.indexOf('.') > 0
@@ -441,7 +441,8 @@ actions.issue = async (payload) => {
 
   const fromVerifiedContract = (api.sender === 'null'
       && VERIFIED_ISSUERS.indexOf(callingContractInfo.name) !== -1)
-      || (callingContractInfo && callingContractInfo.name === 'beedollar');
+      || (callingContractInfo && callingContractInfo.name === 'beedollar')
+      || (callingContractInfo && callingContractInfo.name === 'burndollar');
 
   if (fromVerifiedContract
     || (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
