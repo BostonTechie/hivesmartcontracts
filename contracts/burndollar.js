@@ -17,7 +17,7 @@ actions.createSSC = async () => {
     A token owner can also decide is they want the ineffiecient portion of their token conversion to be burned or go to a DAO or another account
     This routing is to be controlled by a token issuer using burn routing field om the burndollar_burnpair collection
     */
-    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentSymbol', 'burnRouting', 'minConvertibleAmount', 'feePercentage']);
+    await api.db.createTable('burnpair', ['issuer', 'symbol', 'name', 'parentSymbol', 'burnRouting', 'minConvertibleAmount', 'feePercentage', 'callingContractInfo']);
 
     /* For a token_contract owner to issue a new -D token the price is 1000 BEED (burn).
       the smart contrart will bootstrap the -D token into existance
@@ -86,6 +86,7 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
     && api.assert(burnRouting === undefined || (typeof burnRouting === 'string'), 'burn routing must be string')
     && api.assert(minConvertableAmount && typeof minConvertableAmount === 'string' && !api.BigNumber(minConvertableAmount).isNaN() && api.BigNumber(minConvertableAmount).gte(1), 'min convert amount must be string(number) greater than 1')
     && api.assert(feePercentage && typeof feePercentage === 'string' && !api.BigNumber(feePercentage).isNaN() && api.BigNumber(feePercentage).gte(0) && api.BigNumber(feePercentage).lte(1), 'fee percentage must be between 0 and 1 / 0% and 100%')
+    && api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN() && api.BigNumber(maxSupply).gte(2000), 'max supply must be a minimum of 2000 units')
     ) {
       const burnAccount = await api.db.findOneInTable('tokens', 'balances', { account: burnRouting });
       const dsymbol = `${symbol}D`;
@@ -93,28 +94,40 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
       if (api.assert(burnAccount !== null, 'account for burn routing must exist')
         && api.assert(tokenDExists === null, 'D token must not already exist')
       ) { // bootstrap the xxx.D token into existence
-        const tokenProps = {
-          isSignedWithActiveKey,
-          name,
-          symbol: dsymbol,
-          url,
-          precision,
-          maxSupply,
-        };
+        // const meta = {
+        //   url,
+        //   icon,
+        //   desc,
+        // };
 
-        const meta = {
-          url,
-          icon,
-          desc,
-        };
-
-        const updateData = {
-          symbol: dsymbol,
-          metadata: meta,
-        };
+        // const updateData = {
+        //   isSignedWithActiveKey,
+        //   symbol: dsymbol,
+        //   metadata: meta,
+        // };
 
 
         try {
+          // const finalRouting = burnRouting === undefined ? null : burnRouting;
+
+          // const burnPairParams = {
+          //   issuer: api.sender,
+          //   symbol: dsymbol,
+          //   name,
+          //   parentSymbol: symbol,
+          //   burnRouting: finalRouting,
+          //   minConvertableAmount,
+          //   feePercentage,
+          //   callingContractInfo: 'burndollar',
+          // };
+          // await api.db.insert('burnpair', burnPairParams);
+
+          await api.executeSmartContract('tokens', 'create', {
+            issuer: api.sender, isSignedWithActiveKey, name, symbol: dsymbol, precision, maxSupply,
+          });
+          // await api.executeSmartContract('tokens', 'updateMetadata', updateData);
+
+
           const finalRouting = burnRouting === undefined ? null : burnRouting;
 
           const burnPairParams = {
@@ -125,17 +138,11 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
             burnRouting: finalRouting,
             minConvertableAmount,
             feePercentage,
+            callingContractInfo: 'burndollar',
           };
 
+
           await api.db.insert('burnpair', burnPairParams);
-
-
-          // await api.executeSmartContract('tokens', 'create', tokenProps);
-          // await api.executeSmartContract('tokens', 'updateMetadata', updateData);
-
-
-          // This line will only run if the above two await calls resolve without errors
-          console.log('Both actions completed successfully.');
         } catch (error) {
           // Handle any errors that occur during the await calls source is token.js
           console.error(error);
