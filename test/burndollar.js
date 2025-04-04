@@ -155,7 +155,7 @@ describe('burndollar', function () {
       //user must be the owner a pre-existing token that they wish to make into corresponding D token
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
-      //trans #26 active key test and user has BEED enough test
+      //trans #26 does user have enough BEED enough tes ... trans28 signed active key test
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "2000.0", "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "burnRouting": "whale", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": false }'));
@@ -168,7 +168,7 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": "good.com" , "minConvertableAmount": "1", "feePercentage": "1", "burnRouting" : "whale", "maxSupply": 20000, "precision": 2, "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": "good.com" , "minConvertableAmount": "1", "feePercentage": "1", "burnRouting" : "whale", "maxSupply": "tim", "precision": 2, "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": "good.com", "minConvertableAmount": "1", "feePercentage": "1", "burnRouting" : "whale", "maxSupply": "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999", "precision": 2, "isSignedWithActiveKey": true }'));
-      //trans36 URL must be string and not be undefined
+      //trans36 URL must be string
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "url": 123 , "feePercentage": ".5", "burnRouting": "whale", "minConvertableAmount": "1", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans 37 user must be issuer on the Parent token
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "BEE", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
@@ -182,8 +182,7 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "burnRouting": "aggroedthesmall", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
       //trans42  tokenD name must be less than 50 chars
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "name": "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.", "feePercentage": ".5","minConvertableAmount": "1", "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
-      
-      //trans 42+44 the name XXX-D token already exists
+      //trans 43-45 the name XXX-D token already exists
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTESTD", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'issue', '{ "symbol": "URQTESTD", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
@@ -202,8 +201,8 @@ describe('burndollar', function () {
 
       const block1 = res;
       const transactionsBlock1 = block1.transactions;
-      console.log(transactions[44])
-      console.log("  ⚪",JSON.parse(transactionsBlock1[42].logs))
+      // console.log(transactions[28])
+      // console.log("  ⚪",JSON.parse(transactionsBlock1[28].logs))
       console.log(" ")
       console.log( '\u001b[' + 93 + 'm' + 'Test: generates errors when trying to issue D tokens with wrong parameters' + '\u001b[0m')
       console.log("  ⚪",JSON.parse(transactionsBlock1[26].logs).errors[0])
@@ -222,7 +221,7 @@ describe('burndollar', function () {
       console.log("  ⚪",JSON.parse(transactionsBlock1[40].logs).errors[0],"... fee percent must be btwn 0 and 1 ")
       console.log("  ⚪",JSON.parse(transactionsBlock1[41].logs).errors[0],"... does account exist?")
       console.log("  ⚪",JSON.parse(transactionsBlock1[42].logs).errors[0],"... valid name params")
-      // console.log("  ⚪",JSON.parse(transactionsBlock1[44].logs).errors[0],"... XXX-D already exists")
+      console.log("  ⚪",JSON.parse(transactionsBlock1[45].logs).errors[0],"... XXX-D already exists")
 
       assert.equal(JSON.parse(transactionsBlock1[26].logs).errors[0], 'you must have enough tokens to cover the creation fees');
       assert.equal(JSON.parse(transactionsBlock1[28].logs).errors[0], 'you must use a custom_json signed with your active key');
@@ -240,7 +239,7 @@ describe('burndollar', function () {
       assert.equal(JSON.parse(transactionsBlock1[40].logs).errors[0], `fee percentage must be between 0 and 1 / 0% and 100%`);
       assert.equal(JSON.parse(transactionsBlock1[41].logs).errors[0], `account for burn routing must exist`);
       assert.equal(JSON.parse(transactionsBlock1[42].logs).errors[0], `invalid name: letters, numbers, whitespaces only, max length of 50`);
-      // assert.equal(JSON.parse(transactionsBlock1[44].logs).errors[0], `D token must not already exist`);
+      assert.equal(JSON.parse(transactionsBlock1[45].logs).errors[0], `D token must not already exist`);
 
       resolve();
     })
