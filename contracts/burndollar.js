@@ -81,9 +81,9 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
     // ensure the user issuing D token is owner of the parent pair token
     const tokenIssuer = await api.db.findOneInTable('tokens', 'tokens', { issuer: api.sender, symbol });
 
-
+    const finalRouting = burnRouting === undefined ? null : burnRouting;
     if (api.assert(tokenIssuer !== null, 'You must be the token issuer in order to issue D token')
-    && api.assert(burnRouting === undefined || (typeof burnRouting === 'string'), 'burn routing must be string')
+    && api.assert(finalRouting === null || (typeof finalRouting === 'string'), 'burn routing must be string')
     && api.assert(minConvertableAmount && typeof minConvertableAmount === 'string' && !api.BigNumber(minConvertableAmount).isNaN() && api.BigNumber(minConvertableAmount).gte(1), 'min convert amount must be string(number) greater than 1')
     && api.assert(feePercentage && typeof feePercentage === 'string' && !api.BigNumber(feePercentage).isNaN() && api.BigNumber(feePercentage).gte(0) && api.BigNumber(feePercentage).lte(1), 'fee percentage must be between 0 and 1 / 0% and 100%')
     && api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN() && api.BigNumber(maxSupply).gte(2000), 'max supply must be a minimum of 2000 units')
@@ -99,11 +99,13 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
             issuer: api.sender, isSignedWithActiveKey, name, symbol: dsymbol, precision, maxSupply,
           });
 
-
+          const finalUrl = url === undefined ? '' : url;
+          const finalicon = icon === undefined ? '' : icon;
+          const finaldesc = desc === undefined ? '' : desc;
           const meta = {
-            url,
-            icon,
-            desc,
+            url: finalUrl,
+            icon: finalicon,
+            desc: finaldesc,
           };
 
           const updateDataMeta = {
@@ -113,8 +115,6 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
 
           await api.executeSmartContract('tokens', 'updateMetadata', updateDataMeta);
 
-
-          const finalRouting = burnRouting === undefined ? null : burnRouting;
 
           const burnPairParams = {
             issuer: api.sender,
@@ -127,8 +127,14 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
             callingContractInfo: 'burndollar',
           };
 
-
           await api.db.insert('burnpair', burnPairParams);
+
+
+          if (api.BigNumber(issueDTokenFee).gt(0)) {
+            await api.executeSmartContract('tokens', 'transfer', {
+              to: 'null', symbol: 'BEED', quantity: issueDTokenFee, isSignedWithActiveKey,
+            });
+          }
         } catch (error) {
           // Handle any errors that occur during the await calls source is token.js
           console.error(error);
