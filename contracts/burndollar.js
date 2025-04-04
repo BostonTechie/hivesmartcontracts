@@ -89,39 +89,12 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
     && api.assert(maxSupply && typeof maxSupply === 'string' && !api.BigNumber(maxSupply).isNaN() && api.BigNumber(maxSupply).gte(2000), 'max supply must be a minimum of 2000 units')
     ) {
       const burnAccount = await api.db.findOneInTable('tokens', 'balances', { account: burnRouting });
-      const dsymbol = `${symbol}D`;
+      const dsymbol = `${symbol}.D`;
       const tokenDExists = await api.db.findOneInTable('tokens', 'tokens', { symbol: dsymbol });
       if (api.assert(burnAccount !== null, 'account for burn routing must exist')
         && api.assert(tokenDExists === null, 'D token must not already exist')
-      ) { // bootstrap the xxx.D token into existence
-        // const meta = {
-        //   url,
-        //   icon,
-        //   desc,
-        // };
-
-        // const updateData = {
-        //   isSignedWithActiveKey,
-        //   symbol: dsymbol,
-        //   metadata: meta,
-        // };
-
-
+      ) {
         try {
-          // const finalRouting = burnRouting === undefined ? null : burnRouting;
-
-          // const burnPairParams = {
-          //   issuer: api.sender,
-          //   symbol: dsymbol,
-          //   name,
-          //   parentSymbol: symbol,
-          //   burnRouting: finalRouting,
-          //   minConvertableAmount,
-          //   feePercentage,
-          //   callingContractInfo: 'burndollar',
-          // };
-          // await api.db.insert('burnpair', burnPairParams);
-
           await api.executeSmartContract('tokens', 'create', {
             issuer: api.sender, isSignedWithActiveKey, name, symbol: dsymbol, precision, maxSupply,
           });
