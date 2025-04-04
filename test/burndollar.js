@@ -286,8 +286,7 @@ describe('burndollar', function () {
       //trans24-26 user is token_issuer on a parent token has to pay 1000 Beed to issue D token, ,and not pay a Bee fee of 100 for issue of parent token 
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
-      // transaction {payload} pushed ... somehow knows the burndollar is the callingcontract?
-      //transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "name": "myname", "callingContractInfo.name": "burndollar", "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1",  "url":"myurl", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
+      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "name": "mynamissocool",  "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1",  "url":"wickedhoturlhere", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
   
       //   
   // //user must be the owner a pre-existing token that they wish to make into corresponding D token
@@ -325,8 +324,17 @@ describe('burndollar', function () {
         query: {}
       });
 
+      res4 = await fixture.database.find({
+        contract: 'tokens',
+        table: 'tokens',
+        query: {
+          symbol: 'URQTEST.D'
+        }
+      });
+
     console.log(res2, 'response 2 here') 
     console.log(res3, "response 3 here") 
+    console.log(res4, "response 4 here") 
 
     //  console.log(" ")
     //  console.log( '\u001b[' + 93 + 'm' + 'Test: creates a D tokencreates a D token' + '\u001b[0m')

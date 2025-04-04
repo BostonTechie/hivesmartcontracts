@@ -98,7 +98,20 @@ actions.createTokenD = async (payload) => { // allow a token_owner to create the
           await api.executeSmartContract('tokens', 'create', {
             issuer: api.sender, isSignedWithActiveKey, name, symbol: dsymbol, precision, maxSupply,
           });
-          // await api.executeSmartContract('tokens', 'updateMetadata', updateData);
+
+
+          const meta = {
+            url,
+            icon,
+            desc,
+          };
+
+          const updateDataMeta = {
+            symbol: dsymbol,
+            metadata: meta,
+          };
+
+          await api.executeSmartContract('tokens', 'updateMetadata', updateDataMeta);
 
 
           const finalRouting = burnRouting === undefined ? null : burnRouting;
