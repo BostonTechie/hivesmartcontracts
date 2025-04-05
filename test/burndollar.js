@@ -279,20 +279,15 @@ describe('burndollar', function () {
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'marketpools', 'addLiquidity', '{ "tokenPair": "SWAP.HIVE:SWAP.HBD", "baseQuantity": "20000", "quoteQuantity": "200", "maxDeviation": "0", "isSignedWithActiveKey": true }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'marketpools', 'swapTokens', '{ "tokenPair": "SWAP.HIVE:BEE", "tokenSymbol": "SWAP.HIVE", "tokenAmount": "5", "tradeType": "exactOutput", "isSignedWithActiveKey": true}'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'marketpools', 'swapTokens', '{ "tokenPair": "SWAP.HIVE:SWAP.HBD", "tokenSymbol": "SWAP.HBD", "tokenAmount": "5", "tradeType": "exactOutput", "isSignedWithActiveKey": true}'));
-      // above transactions create some BEE, SWAP.HIVE,BEED, and SWAP.HBD at this point drewlongshot account has 99900 BEE to convert and perform operatations, null has zero BEE at this point(ABOVE)
-      // trans#23 now, do a convert from bee to beed (below)
-      transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "2000.0", "isSignedWithActiveKey": true }'));
+      /// above transactions create some BEE, SWAP.HIVE,BEED, and SWAP.HBD at this point drewlongshot account has 99900 BEE to convert and perform operatations, null has zero BEE at this point(ABOVE)
+      // trans#23 now, do a convert from bee to beed (below)..  there should be 2000 BEE burned
+       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'beedollar', 'convert', '{ "quantity": "2000.0", "isSignedWithActiveKey": true }'));
    
-      //trans24-26 user is token_issuer on a parent token has to pay 1000 Beed to issue D token, ,and not pay a Bee fee of 100 for issue of parent token 
+       //trans24-26 user is token_issuer on a parent token has to pay 1000 Beed to issue D token, ,and not pay a Bee fee of 100 for issue of parent token creatation of parent token brings bee burned total to 2100 
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'issue', '{ "symbol": "URQTEST", "quantity": "200", "to": "drewlongshot", "isSignedWithActiveKey": true }'));
+      // BEE should still be 2100 burned and BEED should be at 1000
       transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot','burndollar', 'createTokenD', '{ "name": "mynamissocool",  "symbol": "URQTEST", "feePercentage": ".5","minConvertableAmount": "1",  "url":"wickedhoturlhere", "maxSupply": "20000", "precision": 2, "isSignedWithActiveKey": true }'));
-  
-      //   
-  // //user must be the owner a pre-existing token that they wish to make into corresponding D token
-  //     transactions.push(new Transaction(refBlockNumber, fixture.getNextTxId(), 'drewlongshot', 'tokens', 'create', '{ "isSignedWithActiveKey": true,  "name": "token", "url": "https://token.com", "symbol": "URQTEST", "precision": 3, "maxSupply": "10000", "isSignedWithActiveKey": true  }'));
-    
-        
       
       let block = {
         refHiveBlockNumber: refBlockNumber,
@@ -303,28 +298,24 @@ describe('burndollar', function () {
       };
 
       await fixture.sendBlock(block);
-
-      const res = await fixture.database.getBlockInfo(1);
-
-      const block1 = res;
-      const transactionsBlock1 = block1.transactions;
+     
 
 
-       res2 = await fixture.database.find({
-        contract: 'tokens',
-        table: 'balances',
-        query: {
-          account: "null",        
-        }
-      });
+      //  res2 = await fixture.database.find({
+      //   contract: 'tokens',
+      //   table: 'balances',
+      //   query: {
+      //     account: "null",        
+      //   }
+      // });
 
-      res3 = await fixture.database.find({
-        contract: 'burndollar',
-        table: 'burnpair',
-        query: {}
-      });
+      // res3 = await fixture.database.find({
+      //   contract: 'burndollar',
+      //   table: 'burnpair',
+      //   query: {}
+      // });
 
-      res4 = await fixture.database.find({
+      res = await fixture.database.findOne({
         contract: 'tokens',
         table: 'tokens',
         query: {
@@ -332,16 +323,19 @@ describe('burndollar', function () {
         }
       });
 
-    console.log(res2, 'response 2 here') 
-    console.log(res3, "response 3 here") 
-    console.log(res4, "response 4 here") 
 
-    //  console.log(" ")
-    //  console.log( '\u001b[' + 93 + 'm' + 'Test: creates a D tokencreates a D token' + '\u001b[0m')
+console.log(res)
+     console.log(" ")
+     console.log( '\u001b[' + 93 + 'm' + 'Test: creates a D tokencreates a D token' + '\u001b[0m')
 
-    console.log("  ⚪",JSON.parse(transactionsBlock1[26].logs),"... ")
-    //console.log(transactions[26])
-     //await tableAsserts.assertUserBalances({ account: 'drewlongshot', symbol: `BEED`, balance: '980.0000'});
+     console.log(`  ⚪ It creates my token ${res.symbol}`), 
+     assert.equal(res.symbol, 'URQTEST.D')
+     assert.equal(res.issuer, 'drewlongshot')
+     assert.equal(res.name, 'mynamissocool')
+     assert.equal(JSON.parse(res.metadata).url, 'wickedhoturlhere');
+     assert.equal(res.maxSupply, 20000)
+    //  assert.equal(res.supply, 0)
+
 
 
       resolve();

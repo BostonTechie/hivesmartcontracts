@@ -352,7 +352,7 @@ actions.create = async (payload) => {
   const params = await api.db.findOne('params', {});
   const { tokenCreationFee, heAccounts } = params;
 
-  const fromVerifiedContract = ((api.sender === 'hive-engine' || api.sender === 'burndollar')
+  const fromVerifiedContract = ((api.sender === 'hive-engine')
       && callingContractInfo
       && VERIFIED_ISSUERS.indexOf(callingContractInfo.name) !== -1);
 
